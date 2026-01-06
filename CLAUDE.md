@@ -139,3 +139,6 @@ void 메서드명_상황_기대결과() {
 - `docs/spec-kit/`: 비즈니스 로직 명세서
 - 구현 시 해당 spec 파일 참조
 - spec-kit은 CLAUDE.md 규칙을 따르며, 상세 구현만 정의
+
+## Recent Changes
+- 001-ecommerce-backend: Added Java 25 + Spring Boot 4.0, Spring Data JPA, Spring Security

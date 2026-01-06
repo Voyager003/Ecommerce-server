@@ -1,0 +1,401 @@
+openapi: 3.1.0
+info:
+  title: Product API
+  description: 상품 도메인 API 명세
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+    description: API v1
+
+tags:
+  - name: Product
+    description: 상품 조회
+  - name: Category
+    description: 카테고리
+
+paths:
+  /products:
+    get:
+      tags: [Product]
+      summary: 상품 목록 조회
+      operationId: getProducts
+      parameters:
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+            format: int64
+          description: 카테고리 ID (선택)
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ProductStatus'
+          description: 상품 상태 (기본값 ON_SALE)
+        - name: minPrice
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+        - name: maxPrice
+          in: query
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [createdAt, price, name]
+            default: createdAt
+        - name: direction
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSliceResponse'
+
+  /products/search:
+    get:
+      tags: [Product]
+      summary: 상품 검색
+      operationId: searchProducts
+      parameters:
+        - name: keyword
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 2
+          description: 검색 키워드 (상품명, 설명)
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: 검색 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductPageResponse'
+
+  /products/{productId}:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags: [Product]
+      summary: 상품 상세 조회
+      operationId: getProduct
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetailResponse'
+        '404':
+          description: 상품 없음
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{productId}/options:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags: [Product]
+      summary: 상품 옵션 조회
+      operationId: getProductOptions
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductOptionResponse'
+
+  /categories:
+    get:
+      tags: [Category]
+      summary: 카테고리 전체 조회
+      operationId: getCategories
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryResponse'
+
+  /categories/{categoryId}:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags: [Category]
+      summary: 카테고리 상세 조회
+      operationId: getCategory
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDetailResponse'
+        '404':
+          description: 카테고리 없음
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories/{categoryId}/products:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags: [Category]
+      summary: 카테고리별 상품 조회
+      operationId: getProductsByCategory
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSliceResponse'
+
+components:
+  schemas:
+    ProductStatus:
+      type: string
+      enum: [DRAFT, ON_SALE, SOLD_OUT, DISCONTINUED]
+
+    ProductSummaryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        basePrice:
+          type: integer
+          description: 기본 가격
+        thumbnailUrl:
+          type: string
+        status:
+          $ref: '#/components/schemas/ProductStatus'
+        categoryName:
+          type: string
+        hasOptions:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    ProductDetailResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        basePrice:
+          type: integer
+        thumbnailUrl:
+          type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
+        status:
+          $ref: '#/components/schemas/ProductStatus'
+        category:
+          $ref: '#/components/schemas/CategorySummary'
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductOptionResponse'
+        availableQuantity:
+          type: integer
+          description: 재고 수량 (옵션 없는 경우)
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ProductOptionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        additionalPrice:
+          type: integer
+          description: 추가 금액
+        availableQuantity:
+          type: integer
+          description: 재고 수량
+        isAvailable:
+          type: boolean
+
+    CategoryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        parentId:
+          type: integer
+          format: int64
+          nullable: true
+        depth:
+          type: integer
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryResponse'
+
+    CategoryDetailResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        parent:
+          $ref: '#/components/schemas/CategorySummary'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategorySummary'
+        productCount:
+          type: integer
+
+    CategorySummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+
+    ProductSliceResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductSummaryResponse'
+        hasNext:
+          type: boolean
+        size:
+          type: integer
+        number:
+          type: integer
+
+    ProductPageResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductSummaryResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
