@@ -99,6 +99,30 @@ public class InventoryService {
         inventory.cancelReservation(quantity);
     }
 
+    // Admin API methods
+    public Inventory getInventory(Long productId, Long optionId) {
+        return findInventory(productId, optionId);
+    }
+
+    public java.util.List<Inventory> getInventoriesByProductId(Long productId) {
+        return inventoryRepository.findByProductId(productId);
+    }
+
+    @Transactional
+    public Inventory createInventory(Long productId, Long optionId, int quantity) {
+        Inventory inventory = Inventory.builder()
+                .productId(productId)
+                .productOptionId(optionId)
+                .quantity(quantity)
+                .build();
+        return inventoryRepository.save(inventory);
+    }
+
+    public org.springframework.data.domain.Page<InventoryHistory> getInventoryHistory(
+            Long inventoryId, org.springframework.data.domain.Pageable pageable) {
+        return inventoryHistoryRepository.findByInventoryIdOrderByCreatedAtDesc(inventoryId, pageable);
+    }
+
     private Inventory findInventory(Long productId, Long optionId) {
         if (optionId == null) {
             return inventoryRepository.findByProductIdAndProductOptionIdIsNull(productId)
