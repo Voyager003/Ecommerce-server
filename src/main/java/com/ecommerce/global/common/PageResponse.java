@@ -47,4 +47,16 @@ public class PageResponse<T> {
                 null
         );
     }
+
+    public static <T> PageResponse<T> of(List<T> content, int page, int size,
+                                          long totalElements, int totalPages) {
+        return new PageResponse<>(
+                content,
+                page,
+                size,
+                page < totalPages - 1,
+                totalElements,
+                totalPages
+        );
+    }
 }

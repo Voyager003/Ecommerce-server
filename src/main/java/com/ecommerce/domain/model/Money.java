@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class Money {
 
+    public static final Money ZERO = new Money(0);
+
     private long amount;
 
     private Money(long amount) {
