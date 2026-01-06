@@ -25,11 +25,11 @@
 
 **목적**: 프로젝트 구조 생성 및 기본 설정
 
-- [ ] T001 Spring Boot 4.0 프로젝트 생성 및 build.gradle 의존성 설정
-- [ ] T002 [P] 프로젝트 디렉토리 구조 생성 (domain/, global/, infra/)
-- [ ] T003 [P] application.yml 환경별 설정 파일 작성 (local, prod)
-- [ ] T004 [P] JpaConfig 설정 클래스 생성 `global/config/JpaConfig.java`
-- [ ] T005 [P] WebConfig 설정 클래스 생성 `global/config/WebConfig.java`
+- [x] T001 Spring Boot 4.0 프로젝트 생성 및 build.gradle 의존성 설정
+- [x] T002 [P] 프로젝트 디렉토리 구조 생성 (domain/, global/, infra/)
+- [x] T003 [P] application.yml 환경별 설정 파일 작성 (local, prod)
+- [x] T004 [P] JpaConfig 설정 클래스 생성 `global/config/JpaConfig.java`
+- [x] T005 [P] WebConfig 설정 클래스 생성 `global/config/WebConfig.java`
 
 ---
 
