@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -22,4 +23,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("status") MemberStatus status,
             @Param("withdrawnAfter") LocalDateTime withdrawnAfter
     );
+
+    @Query("SELECT m FROM Member m WHERE m.status = 'ACTIVE'")
+    List<Member> findByStatusActive();
 }

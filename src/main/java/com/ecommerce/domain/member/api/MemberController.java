@@ -1,6 +1,8 @@
 package com.ecommerce.domain.member.api;
 
+import com.ecommerce.domain.member.application.GradeService;
 import com.ecommerce.domain.member.application.MemberService;
+import com.ecommerce.domain.member.dto.GradeBenefitResponse;
 import com.ecommerce.domain.member.dto.MemberResponse;
 import com.ecommerce.domain.member.dto.MemberUpdateRequest;
 import com.ecommerce.domain.member.dto.PasswordChangeRequest;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final GradeService gradeService;
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<MemberResponse>> getMyInfo(
@@ -47,5 +50,12 @@ public class MemberController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         memberService.withdraw(userDetails.getMemberId());
         return ResponseEntity.ok(ApiResponse.noContent());
+    }
+
+    @GetMapping("/me/grade")
+    public ResponseEntity<ApiResponse<GradeBenefitResponse>> getMyGrade(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        var benefits = gradeService.getGradeBenefits(userDetails.getMemberId());
+        return ResponseEntity.ok(ApiResponse.ok(GradeBenefitResponse.from(benefits)));
     }
 }
