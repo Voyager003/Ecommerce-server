@@ -43,6 +43,21 @@ public class Money {
         return new Money(this.amount * quantity);
     }
 
+    public Money multiply(long factor) {
+        return new Money(this.amount * factor);
+    }
+
+    public Money divide(long divisor) {
+        if (divisor == 0) {
+            throw new IllegalArgumentException("0으로 나눌 수 없습니다");
+        }
+        return new Money(this.amount / divisor);
+    }
+
+    public int compareTo(Money other) {
+        return Long.compare(this.amount, other.amount);
+    }
+
     public boolean isGreaterThanOrEqual(Money other) {
         return this.amount >= other.amount;
     }

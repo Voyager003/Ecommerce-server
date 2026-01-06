@@ -61,7 +61,10 @@ public enum ErrorCode {
     COUPON_EXHAUSTED("CP004", "쿠폰이 모두 소진되었습니다", 410),
     COUPON_EXPIRED("CP005", "유효기간이 만료된 쿠폰입니다", 400),
     COUPON_MIN_ORDER_NOT_MET("CP006", "최소 주문 금액 조건을 충족하지 않습니다", 400),
-    COUPON_ALREADY_USED("CP007", "이미 사용된 쿠폰입니다", 400);
+    COUPON_ALREADY_USED("CP007", "이미 사용된 쿠폰입니다", 400),
+    COUPON_QUANTITY_EXCEEDED("CP008", "쿠폰 발급 수량이 초과되었습니다", 400),
+    COUPON_MIN_ORDER_AMOUNT_NOT_MET("CP009", "최소 주문 금액 조건을 충족하지 않습니다", 400),
+    COUPON_CANNOT_RESTORE("CP010", "쿠폰을 복원할 수 없습니다", 400);
 
     private final String code;
     private final String message;
