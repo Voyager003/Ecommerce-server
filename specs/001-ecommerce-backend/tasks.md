@@ -41,36 +41,36 @@
 
 ### 공통 엔티티 및 유틸리티
 
-- [ ] T006 [P] BaseTimeEntity 생성 (createdAt, updatedAt 자동 관리) `domain/model/BaseTimeEntity.java`
-- [ ] T007 [P] Money 값 객체 생성 `domain/model/Money.java`
-- [ ] T008 [P] ApiResponse 공통 응답 클래스 생성 `global/common/ApiResponse.java`
-- [ ] T009 [P] PageRequest/PageResponse 페이징 클래스 생성 `global/common/PageRequest.java`, `global/common/PageResponse.java`
+- [x] T006 [P] BaseTimeEntity 생성 (createdAt, updatedAt 자동 관리) `domain/model/BaseTimeEntity.java`
+- [x] T007 [P] Money 값 객체 생성 `domain/model/Money.java`
+- [x] T008 [P] ApiResponse 공통 응답 클래스 생성 `global/common/ApiResponse.java`
+- [x] T009 [P] PageRequest/PageResponse 페이징 클래스 생성 `global/common/PageRequest.java`, `global/common/PageResponse.java`
 
 ### 예외 처리 체계
 
-- [ ] T010 [P] ErrorCode enum 정의 (회원, 상품, 주문, 결제, 쿠폰 에러 코드) `global/error/ErrorCode.java`
-- [ ] T011 [P] BusinessException 예외 클래스 생성 `global/error/BusinessException.java`
-- [ ] T012 [P] ErrorResponse 응답 클래스 생성 `global/error/ErrorResponse.java`
-- [ ] T013 GlobalExceptionHandler 구현 `global/error/GlobalExceptionHandler.java`
+- [x] T010 [P] ErrorCode enum 정의 (회원, 상품, 주문, 결제, 쿠폰 에러 코드) `global/error/ErrorCode.java`
+- [x] T011 [P] BusinessException 예외 클래스 생성 `global/error/BusinessException.java`
+- [x] T012 [P] ErrorResponse 응답 클래스 생성 `global/error/ErrorResponse.java`
+- [x] T013 GlobalExceptionHandler 구현 `global/error/GlobalExceptionHandler.java`
 
 ### JWT 인증 인프라
 
-- [ ] T014 [P] JwtTokenProvider 구현 (토큰 생성/검증) `global/security/JwtTokenProvider.java`
-- [ ] T015 [P] CustomUserDetails 구현 `global/security/CustomUserDetails.java`
-- [ ] T016 JwtAuthenticationFilter 구현 `global/security/JwtAuthenticationFilter.java`
-- [ ] T017 SecurityConfig 설정 (BCrypt, 인증 필터 체인) `global/config/SecurityConfig.java`
+- [x] T014 [P] JwtTokenProvider 구현 (토큰 생성/검증) `global/security/JwtTokenProvider.java`
+- [x] T015 [P] CustomUserDetails 구현 `global/security/CustomUserDetails.java`
+- [x] T016 JwtAuthenticationFilter 구현 `global/security/JwtAuthenticationFilter.java`
+- [x] T017 SecurityConfig 설정 (BCrypt, 인증 필터 체인) `global/config/SecurityConfig.java`
 
 ### 멱등성 인프라
 
-- [ ] T018 [P] IdempotencyRecord 엔티티 생성 `global/idempotency/IdempotencyRecord.java`
-- [ ] T019 [P] IdempotencyRepository 생성 `global/idempotency/IdempotencyRepository.java`
-- [ ] T020 IdempotencyService 구현 `global/idempotency/IdempotencyService.java`
+- [x] T018 [P] IdempotencyRecord 엔티티 생성 `global/idempotency/IdempotencyRecord.java`
+- [x] T019 [P] IdempotencyRepository 생성 `global/idempotency/IdempotencyRepository.java`
+- [x] T020 IdempotencyService 구현 `global/idempotency/IdempotencyService.java`
 
 ### Mock PG 클라이언트
 
-- [ ] T021 [P] PgClient 인터페이스 정의 `infra/pg/PgClient.java`
-- [ ] T022 [P] PgResponse 응답 클래스 생성 `infra/pg/PgResponse.java`
-- [ ] T023 MockPgClient 구현 (성공/실패/타임아웃 시나리오) `infra/pg/MockPgClient.java`
+- [x] T021 [P] PgClient 인터페이스 정의 `infra/pg/PgClient.java`
+- [x] T022 [P] PgResponse 응답 클래스 생성 `infra/pg/PgResponse.java`
+- [x] T023 MockPgClient 구현 (성공/실패/타임아웃 시나리오) `infra/pg/MockPgClient.java`
 
 **체크포인트**: 공통 인프라 완료 - User Story 구현 시작 가능
 
