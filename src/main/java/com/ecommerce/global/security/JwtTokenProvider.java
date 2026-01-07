@@ -3,22 +3,20 @@ package com.ecommerce.global.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Date;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
@@ -31,7 +29,6 @@ public class JwtTokenProvider {
     private long refreshTokenValidity;
 
     private SecretKey secretKey;
-    private final UserDetailsService userDetailsService;
 
     @PostConstruct
     protected void init() {
@@ -67,9 +64,16 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        String email = getEmail(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        Claims claims = parseClaims(token);
+        Long memberId = claims.get("memberId", Long.class);
+        String email = claims.getSubject();
+
+        JwtAuthenticationPrincipal principal = new JwtAuthenticationPrincipal(memberId, email);
+        return new UsernamePasswordAuthenticationToken(
+                principal,
+                "",
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+        );
     }
 
     public String getEmail(String token) {
