@@ -1,0 +1,425 @@
+openapi: 3.1.0
+info:
+  title: Coupon API
+  description: 쿠폰 도메인 API 명세
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+    description: API v1
+
+tags:
+  - name: Coupon
+    description: 쿠폰 조회 및 발급
+  - name: MemberCoupon
+    description: 내 쿠폰 관리
+
+paths:
+  /coupons:
+    get:
+      tags: [Coupon]
+      summary: 발급 가능한 쿠폰 목록 조회
+      operationId: getAvailableCoupons
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CouponResponse'
+
+  /coupons/{couponId}:
+    parameters:
+      - name: couponId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags: [Coupon]
+      summary: 쿠폰 상세 조회
+      operationId: getCoupon
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CouponDetailResponse'
+        '404':
+          description: 쿠폰 없음
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /coupons/{couponId}/issue:
+    parameters:
+      - name: couponId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    post:
+      tags: [Coupon]
+      summary: 쿠폰 발급
+      operationId: issueCoupon
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: 발급 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberCouponResponse'
+        '400':
+          description: 발급 불가 (조건 미충족)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 이미 보유한 쿠폰
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '410':
+          description: 쿠폰 소진
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /members/me/coupons:
+    get:
+      tags: [MemberCoupon]
+      summary: 내 쿠폰 목록 조회
+      operationId: getMyCoupons
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/MemberCouponStatus'
+          description: 쿠폰 상태 필터
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberCouponSliceResponse'
+
+  /members/me/coupons/available:
+    get:
+      tags: [MemberCoupon]
+      summary: 주문에 적용 가능한 내 쿠폰 조회
+      operationId: getApplicableCoupons
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderAmount
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: 주문 금액
+        - name: productIds
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+          description: 상품 ID 목록 (카테고리/상품 한정 쿠폰 필터링용)
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApplicableCouponResponse'
+
+  /members/me/coupons/{memberCouponId}:
+    parameters:
+      - name: memberCouponId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags: [MemberCoupon]
+      summary: 내 쿠폰 상세 조회
+      operationId: getMyCoupon
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberCouponDetailResponse'
+        '404':
+          description: 쿠폰 없음
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CouponType:
+      type: string
+      enum: [FIXED_AMOUNT, PERCENTAGE]
+      description: |
+        - FIXED_AMOUNT: 정액 할인
+        - PERCENTAGE: 정률 할인
+
+    CouponStatus:
+      type: string
+      enum: [ACTIVE, INACTIVE, EXHAUSTED, EXPIRED]
+      description: |
+        - ACTIVE: 발급 가능
+        - INACTIVE: 비활성화
+        - EXHAUSTED: 수량 소진
+        - EXPIRED: 기간 만료
+
+    MemberCouponStatus:
+      type: string
+      enum: [AVAILABLE, USED, EXPIRED]
+      description: |
+        - AVAILABLE: 사용 가능
+        - USED: 사용 완료
+        - EXPIRED: 유효기간 만료
+
+    CouponResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/CouponType'
+        discountValue:
+          type: integer
+          description: 할인 금액 또는 할인율
+        maxDiscountAmount:
+          type: integer
+          description: 최대 할인 금액 (정률 할인 시)
+        minOrderAmount:
+          type: integer
+          description: 최소 주문 금액
+        remainingQuantity:
+          type: integer
+          description: 남은 발급 수량
+        validDays:
+          type: integer
+          description: 발급 후 유효 일수
+        expiresAt:
+          type: string
+          format: date-time
+          description: 쿠폰 발급 마감일
+
+    CouponDetailResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/CouponType'
+        discountValue:
+          type: integer
+        maxDiscountAmount:
+          type: integer
+        minOrderAmount:
+          type: integer
+        totalQuantity:
+          type: integer
+        remainingQuantity:
+          type: integer
+        validDays:
+          type: integer
+        status:
+          $ref: '#/components/schemas/CouponStatus'
+        applicableCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategorySummary'
+          description: 적용 가능 카테고리 (전체 적용 시 빈 배열)
+        applicableProducts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductSummary'
+          description: 적용 가능 상품 (전체 적용 시 빈 배열)
+        requiredGrade:
+          type: string
+          description: 필요 회원 등급 (null이면 전체)
+        startsAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+
+    MemberCouponResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        couponId:
+          type: integer
+          format: int64
+        couponName:
+          type: string
+        type:
+          $ref: '#/components/schemas/CouponType'
+        discountValue:
+          type: integer
+        maxDiscountAmount:
+          type: integer
+        minOrderAmount:
+          type: integer
+        status:
+          $ref: '#/components/schemas/MemberCouponStatus'
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+
+    MemberCouponDetailResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        coupon:
+          $ref: '#/components/schemas/CouponDetailResponse'
+        status:
+          $ref: '#/components/schemas/MemberCouponStatus'
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        usedAt:
+          type: string
+          format: date-time
+        usedOrderNumber:
+          type: string
+          description: 사용된 주문 번호 (사용한 경우)
+
+    ApplicableCouponResponse:
+      type: object
+      properties:
+        memberCouponId:
+          type: integer
+          format: int64
+        couponName:
+          type: string
+        type:
+          $ref: '#/components/schemas/CouponType'
+        discountValue:
+          type: integer
+        expectedDiscountAmount:
+          type: integer
+          description: 예상 할인 금액 (주문 금액 기준 계산)
+        minOrderAmount:
+          type: integer
+        expiresAt:
+          type: string
+          format: date-time
+        isApplicable:
+          type: boolean
+          description: 현재 주문에 적용 가능 여부
+        notApplicableReason:
+          type: string
+          description: 적용 불가 사유 (해당 시)
+
+    MemberCouponSliceResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberCouponResponse'
+        hasNext:
+          type: boolean
+        size:
+          type: integer
+        number:
+          type: integer
+
+    CategorySummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+
+    ProductSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
