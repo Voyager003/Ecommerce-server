@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
-@Profile("local")
+@Profile("!prod")
 public class MockPgClient implements PgClient {
 
     private final Map<String, PgResponse> transactions = new ConcurrentHashMap<>();
